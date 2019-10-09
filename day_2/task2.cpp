@@ -10,7 +10,7 @@
 // 4. Add a member function called print() that prints the fields in some
 // descriptive manner.
 
-enum class Gender
+enum  Gender
 {
   F, M, D
 };
@@ -21,12 +21,13 @@ struct Person
   short age{};
   Gender gender;
 
-  void print(Person const & p)
+  void print()
   {
-    std::cout << "Name: " << p.name << '\n';
-              //<< "Age: " << p.age << '\n';
-              //<< "Gender: " << p.gender << '\n';
+    std::cout << "Name: " << name << '\n'
+              << "Age: " << age << '\n'
+              << "Gender: " << gender << '\n';
   }
+
 };
 
 int main()
@@ -35,6 +36,5 @@ int main()
   p1.name="A";
   p1.age=1;
   p1.gender=Gender::D;
-  p1.print()
-  //std::cout << p1.name << p1.age << p1.gender << '\n';
+  p1.print();
 }
