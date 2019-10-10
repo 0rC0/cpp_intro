@@ -75,8 +75,8 @@ struct Db
 
   void add(Record const & r)
   {
-    uint32_t new_id = last_id + 1;
-    entries[new_id] = r;
+    last_id++;
+    entries[last_id] = r;
   }
 
   void search(uint32_t const id)
