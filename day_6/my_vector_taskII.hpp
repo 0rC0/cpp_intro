@@ -1,28 +1,26 @@
-#include <memory>
-
 template <typename T>
 class MyVector
 {
 private:
+  T * data{};
   size_t size{};
-  std::unique_ptr<T[]> data{};
 public:
   MyVector() = default;
   MyVector(MyVector const & rhs) { operator=(rhs); }
   MyVector(MyVector &&) = default;
-  MyVector(size_t const s) : size{s}, data{new T[s]{}} {}
   MyVector & operator=(MyVector const & rhs)
   {
     if ( this != &rhs) {
       size = rhs.size;
-      data.reset(new T[size]);
+      delete[] data; data = new T[size];
       for (size_t i = 0; i< size; ++i)
         data[i] = rhs.data[i];
     }
     return *this;
   }
   MyVector & operator=(MyVector && rhs) = default;
-  ~MyVector() = default;
+  MyVector(size_t const s) { size=s; data=new T[s]{}; }
+  ~MyVector() { delete[] data; }
 
   MyVector & operator[](size_t n)
   {
@@ -38,8 +36,8 @@ public:
     }
     return out;
   }
-  T* begin() {return data.get();}
-  T* end() const { return data.get() + size;}
+  T* begin() { return data; }
+  T* end() { return data + size; }
 
   size_t const & sizes()
   {
@@ -48,15 +46,12 @@ public:
 
   void resize(size_t const & s)
   {
-      T* old = data.get();
+      T* old = data;
       size_t old_size = size;
       size = old_size + s;
-      data.reset(new T[size]);
+      delete[] data; data = new T[size + s];
       for (size_t i = 0; i< old_size; ++i)
         data[i] = old[i];
-      //inizialize new spaces to 0
-      for (size_t i = old_size; i<size; ++i)
-        data[i] = 0;
   }
 
   void push_back(T const & item)
