@@ -16,28 +16,25 @@ int main()
   //compute the histogram
   int rest[100]{};
   float sum{0};
-  float N = 2e2;
+  float N = 2e8;
   #pragma omp parallel
   {
     int a[100]{};
     int tmp{0};
     #pragma omp for private(tmp)
-    for (auto x=0; x<N; ++x)
+    for (long long int x=1; x<(long long int)N+1; ++x)
     {
         tmp = fx(x);
-        std::cout << x << '\n';
-        a[tmp] += 1;
-    }
-    #pragma omp critical
-    {
-
+        //std::cout << x << '\n';
+        #pragma omp atomic
+        rest[tmp] += 1;
     }
   }
-    for (int j=0; j<100; ++j)
-    {
-      std::cout << (j+1) << ": " << rest[j] << '\n';
-      sum += rest[j];
-    }
+  for (int j=0; j<100; ++j)
+  {
+    std::cout << (j+1) << ": " << rest[j] << '\n';
+    sum += rest[j];
+  }
     std::cout << sum << '\n';
 
 }
