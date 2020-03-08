@@ -4,65 +4,76 @@ template <typename T>
 class MyVector
 {
 private:
-  size_t size{};
-  std::unique_ptr<T[]> data{};
+  size_t _size{}, _capacity{};
+  std::unique_ptr<T[]> _data{};
+
+  void _expand(size_t new_cap)
+  {
+    std::unique_ptr<T[]> tmp(std::make_unique<T[]>(new_cap));
+    for (size_t i = 0; i < _size; ++i)
+      tmp[i] = std::move(_data[i]);
+    _data = std::move(tmp);
+    _capacity = new_cap;
+  }
+
 public:
   MyVector() = default;
-  MyVector(MyVector const & rhs) { operator=(rhs); }
-  MyVector(MyVector &&) = default;
-  MyVector(size_t const s) : size{s}, data{new T[s]{}} {}
+  MyVector(MyVector const & rhs) { operator=(rhs); } //cpoy constructor
+  MyVector(MyVector && rhs) {operator=(std::move(rhs));}
+  MyVector(size_t const s) : _size{s}, _data{new T[s]{}} {}
+  //copy assignment
   MyVector & operator=(MyVector const & rhs)
   {
     if ( this != &rhs) {
-      size = rhs.size;
-      data.reset(new T[size]);
-      for (size_t i = 0; i< size; ++i)
-        data[i] = rhs.data[i];
+      _size = rhs._size; //copy size
+      _capacity = rhs._capacity; //copy capacity
+      _data.reset(new T[_size]); //deallocate and reallocate
+      for (size_t i = 0; i< _size; ++i)
+        _data[i] = rhs._data[i]; //copy every element
     }
     return *this;
   }
-  MyVector & operator=(MyVector && rhs) = default;
+  //move assignment
+  MyVector & operator=(MyVector && rhs)
+  {
+    _size = rhs._size; //copy size
+    _capacity = rhs._capacity; //copy capacity
+    _data = std::move(rhs._data); //copy every element
+    return *this;
+  }
+
   ~MyVector() = default;
 
-  MyVector & operator[](size_t n)
+  MyVector & operator[](size_t idx)
   {
-    T out{};
-    size_t c = 1;
-    for (auto const i : data) {
-      std::cout << i <<'\n';
-      if (c==n) {
-        out = i;
-        break;
-      }
-      c += 1;
+    return _data[idx];
+  }
+
+  T* begin() {return _data.get();}
+  T* end() const { return _data.get() + _size;}
+
+  size_t const & get_size()
+  {
+    return _size;
+  }
+
+  void resize(size_t new_size)
+  {
+    if (new_size > _capacity)
+      _expand(new_size);
+    _size = new_size;
+  }
+
+  void push_back(T elem)
+  {
+    if (_size == _capacity)
+    {
+      if(_capacity)
+        _expand(_capacity << 1);
+      else
+        _expand();
     }
-    return out;
-  }
-  T* begin() {return data.get();}
-  T* end() const { return data.get() + size;}
-
-  size_t const & sizes()
-  {
-    return size;
-  }
-
-  void resize(size_t const & s)
-  {
-      T* old = data.get();
-      size_t old_size = size;
-      size = old_size + s;
-      data.reset(new T[size]);
-      for (size_t i = 0; i< old_size; ++i)
-        data[i] = old[i];
-      //inizialize new spaces to 0
-      for (size_t i = old_size; i<size; ++i)
-        data[i] = 0;
-  }
-
-  void push_back(T const & item)
-  {
-    this->resize(1);
-    data[size-1] = item;
+    _data[_size++] = std::move(elem);
   }
 
 };

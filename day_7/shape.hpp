@@ -1,19 +1,19 @@
 #include <cmath>
 
-class ShapeInterface
+struct ShapeInterface
 {
 public:
   //contructors
   ShapeInterface() = default;
-  
+
   virtual double area() const = 0; // this function is pure virtual
   virtual double perimeter() const = 0; // this function is pure virtual
 };
 
-class Square : public ShapeInterface
+struct Square : ShapeInterface
 {
   double width{};
-  
+
 public:
   //constructors
   Square() : width{}
@@ -30,27 +30,25 @@ public:
   double perimeter() const override
     { return 4*width; }
 };
-  
-class Circle : public ShapeInterface
+
+struct Circle : public ShapeInterface
 {
-  
+
 private:
   static constexpr double pi = 3.14;
   double radius{};
-  
+
 public:
   //constructors
   Circle() : radius{}
-  { } 
+  { }
   Circle(Circle const & ) = default;
   Circle(Circle &&) = default;
   Circle & operator=(Circle const &) = default;
   Circle & operator=(Circle &&) = default;
   ~Circle() = default;
-  
 
-  double area() const override
-    { return pi*radius*radius; }
-  double perimeter() const override 
-    { return 2*pi*radius; }
+
+  double area() const override { return pi*radius*radius; }
+  double perimeter() const override { return 2*pi*radius; }
 };
